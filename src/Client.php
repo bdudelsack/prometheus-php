@@ -5,6 +5,7 @@ class Client {
 	private $registry;
 	private $options;
 	private $base_uri;
+	private $labels;
 
 	public function __construct(array $options = []) {
 		$this->registry = new Registry;
@@ -59,6 +60,10 @@ class Client {
 		if($job) $url.=$job;
 		if($instance) $url.="/instance/".$instance;
 
+		foreach($this->labels as $label => $labelValue) {
+			$url.=('/' . urlencode($label) . '/' . urlencode($labelValue));
+		}
+
 		$ch = \curl_init($url);
 
 		\curl_setopt( $ch, CURLOPT_RETURNTRANSFER, TRUE );
@@ -72,6 +77,11 @@ class Client {
 
 		#TODO: Can the pushgateway return a 200 on successful PUT?
 		# Currently it returns nothing no matter what, lame
+	}
+
+	public function setLabels(array $labels)
+	{
+		$this->labels = $labels;
 	}
 }
 
