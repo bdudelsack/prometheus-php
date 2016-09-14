@@ -14,12 +14,15 @@ abstract class Metric {
 
 	public $full_name;
 
+	public $timestamped = false;
+
 	public function __construct(array $opts = []) {
 		$this->opts = $opts;
 		$this->name = isset($opts['name']) ? $opts['name'] : '';
 		$this->namespace = isset($opts['namespace']) ? $opts['namespace'] : '';
 		$this->subsystem = isset($opts['subsystem']) ? $opts['subsystem'] : '';
 		$this->help = isset($opts['help']) ? $opts['help'] : '';
+		$this->timestamped = isset($opts['timestamped']) ? (bool)$opts['timestamped'] : '';
 
 		if (empty($this->name)) throw new PrometheusException("A name is required for a metric");
 		if (empty($this->help)) throw new PrometheusException("A help is required for a metric");
@@ -66,7 +69,7 @@ abstract class Metric {
 				$v = str_replace("\\", "\\\\", $v);
 				$label_pairs []= "$k=\"$v\"";
 			}
-			$tbr []= $this->full_name . $suffix . "{" . implode(",", $label_pairs) . "} " . $value;
+			$tbr []= $this->full_name . $suffix . "{" . implode(",", $label_pairs) . "} " . $value . ($this->timestamped ? (' ' . time() . '000') : '');
 		}
 		return implode("\n", $tbr);
 	}
